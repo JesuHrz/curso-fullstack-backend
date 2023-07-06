@@ -1,3 +1,5 @@
+'use strict'
+
 class DatabaseConnectionError extends Error {
   constructor (message) {
     super(message)
@@ -5,6 +7,14 @@ class DatabaseConnectionError extends Error {
   }
 }
 
+class AuthenticationError extends Error {
+  constructor (message = 'Unauthorized.') {
+    super(message)
+    this.name = 'AuthenticationError'
+  }
+}
+
 module.exports = {
+  AuthenticationError,
   DatabaseConnectionError
 }

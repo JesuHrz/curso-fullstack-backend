@@ -1,31 +1,28 @@
+'use strict'
+
 const express = require('express')
 const bodyParser = require('body-parser')
+const morgan = require('morgan')
 
+const { authRoutes } = require('./routes')
 const response = require('./utils/response')
 
 const app = express()
-
-const morgan = require('morgan')
 
 app.use(morgan('tiny'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-app.post('/blogs', (req, res) => {
-  const data = { greeting: 'HOLA blogs' }
+// Routres
+app.use('/api/auth', authRoutes)
 
-  response.success(res, { code: 201, data })
-})
-
-app.get('/blogs/:id/links/:linkIds', (req, res) => {
-  console.log('req.params', req.params)
-  console.log('req.query', req.query)
-  res.status(200)
-  res.json({
-    greeting: 'HOLA blogs'
-  })
-})
-
+// 404 Error
 app.use((_, res, ___) => response.error(res))
+
+// 500 Error
+app.use((err, __, res, ____) => {
+  console.error(err.stack)
+  response.error(res, { message: 'Something was wrong.', code: 500 })
+})
 
 module.exports = app

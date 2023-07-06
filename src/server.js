@@ -1,3 +1,5 @@
+'use strict'
+
 require('dotenv').config()
 const http = require('http')
 
@@ -9,9 +11,8 @@ const { PORT } = process.env
 
 ;(async () => {
   try {
-    const server = http.createServer(app)
-
     await createConnection()
+    const server = http.createServer(app)
 
     server.listen(PORT, () => {
       console.log(`Server running localhost:${PORT}`)
