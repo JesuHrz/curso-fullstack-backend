@@ -14,7 +14,16 @@ class AuthenticationError extends Error {
   }
 }
 
+class NotFoundError extends Error {
+  constructor (message = 'Not found.') {
+    super(message)
+    this.name = 'NotFoundError'
+    this.code = 404
+  }
+}
+
 module.exports = {
   AuthenticationError,
-  DatabaseConnectionError
+  DatabaseConnectionError,
+  NotFoundError
 }

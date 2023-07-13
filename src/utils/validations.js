@@ -1,6 +1,6 @@
 'use strict'
 
-const { object, string, number } = require('yup')
+const { object, string, number, mixed } = require('yup')
 
 const emailAndPasswordValidation = object({
   email: string()
@@ -17,20 +17,30 @@ const signInValidation = object({
 
 const signUpValidation = object({
   body: emailAndPasswordValidation.shape({
-    fullName: string().required('Fullname is required.')
+    name: string().required('Name is required.')
   })
 })
 
 const billingValidation = object({
-  name: string().required('Name is required.'),
-  description: string().optional(),
-  dateOfPaid: string().required('Date of paid is required.'),
-  price: number().positive().integer().required('Price is required.')
+  body: object({
+    name: string().required('Name is required.'),
+    description: string().optional(),
+    dateOfPaid: string().required('Date of paid is required.'),
+    price: number().positive().integer().required('Price is required.')
+  })
+})
+
+const filterBillingsValidation = object({
+  query: object({
+    type: mixed().oneOf(['date', 'price']).required('type is required.'),
+    value: string().required('Value is required.')
+  })
 })
 
 module.exports = {
   emailAndPasswordValidation,
   signInValidation,
   signUpValidation,
-  billingValidation
+  billingValidation,
+  filterBillingsValidation
 }

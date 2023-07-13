@@ -1,10 +1,9 @@
 'use strict'
 
 const { Sequelize, DataTypes } = require('sequelize')
-const { encrypt, compare } = require('../utils/encrypt')
 
 module.exports = (sequelize) => {
-  const User = sequelize.define('user', {
+  const Billing = sequelize.define('billing', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -15,12 +14,15 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
+    price: {
+      type: DataTypes.DOUBLE,
+      allowNull: false
     },
-    password: {
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    dateOfPaid: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -34,21 +36,12 @@ module.exports = (sequelize) => {
     }
   },
   {
-    tableName: 'user'
+    tableName: 'billing'
   })
 
-  User.beforeCreate(async (user) => {
-    const hashedPassword = await encrypt(user.password)
-    user.password = hashedPassword
-  })
-
-  User.prototype.validatePassword = async function (password) {
-    return compare(password, this.password)
+  if (sequelize.models.user) {
+    Billing.belongsTo(sequelize.models.user)
   }
 
-  if (sequelize.models.billing) {
-    User.hasMany(sequelize.models.billing)
-  }
-
-  return User
+  return Billing
 }

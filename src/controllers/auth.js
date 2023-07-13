@@ -3,6 +3,7 @@
 const { User } = require('../models')
 const response = require('../utils/response')
 const { AuthenticationError } = require('../utils/errors')
+const { sign } = require('../utils/jwt')
 
 const signIn = async (req, res) => {
   try {
@@ -14,7 +15,11 @@ const signIn = async (req, res) => {
       throw new AuthenticationError('Email and/or password are invalid.')
     }
 
-    response.success(res, { code: 200, message: 'Authenticated.' })
+    const { password: _, ...user } = existingUser.toJSON()
+
+    const token = await sign(user)
+
+    response.success(res, { code: 200, data: { jwt: token } })
   } catch (e) {
     const responseError = { code: 500, message: 'Something was wrong.' }
 
@@ -29,7 +34,7 @@ const signIn = async (req, res) => {
 
 const signUp = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body
+    const { name, email, password } = req.body
     const existingUser = await User.findOne({ where: { email } })
 
     if (existingUser) {
@@ -37,10 +42,12 @@ const signUp = async (req, res) => {
       return
     }
 
-    const createdUser = await User.create({ fullName, email, password })
+    const createdUser = await User.create({ name, email, password })
     const { password: _, ...user } = createdUser.toJSON()
 
-    response.success(res, { code: 201, data: user })
+    const token = await sign(user)
+
+    response.success(res, { code: 201, data: { jwt: token } })
   } catch (e) {
     response.error(res, { code: 400, message: 'Bad request.' })
   }
